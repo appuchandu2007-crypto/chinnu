@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: reviews
+    // Fields: name (string), role (string), text (string), rating (number), likes (number), createdAt (timestamp)
+    //
+    // Collection: quotes
+    // Fields: name (string), quote (string), createdAt (timestamp)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidReview() {
+      return hasOnlyAllowedFields(['name', 'role', 'text', 'rating', 'likes', 'createdAt']) &&
+             request.resource.data.name is string &&
+             request.resource.data.name.size() <= 50 &&
+             request.resource.data.role is string &&
+             request.resource.data.role.size() <= 50 &&
+             request.resource.data.text is string &&
+             request.resource.data.text.size() > 0 &&
+             request.resource.data.text.size() <= 500 &&
+             request.resource.data.rating is number &&
+             request.resource.data.rating >= 1 &&
+             request.resource.data.rating <= 5 &&
+             request.resource.data.likes is number &&
+             request.resource.data.likes >= 0 &&
+             request.resource.data.createdAt is timestamp;
+    }
+
+    function isValidQuote() {
+      return hasOnlyAllowedFields(['name', 'quote', 'createdAt']) &&
+             request.resource.data.name is string &&
+             request.resource.data.name.size() <= 50 &&
+             request.resource.data.quote is string &&
+             request.resource.data.quote.size() > 0 &&
+             request.resource.data.quote.size() <= 300 &&
+             request.resource.data.createdAt is timestamp;
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isValidReview();
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']) &&
+                       request.resource.data.likes == resource.data.get('likes', 0) + 1;
+      allow delete: if false;
+    }
+
+    match /quotes/{quoteId} {
+      allow read: if true;
+      allow create: if isValidQuote();
+      allow update, delete: if false;
+    }
+  }
+}

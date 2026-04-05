@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "Review": {
+      "title": "Review",
+      "description": "A user review for the platform.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the reviewer"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role of the reviewer"
+        },
+        "text": {
+          "type": "string",
+          "description": "The review content"
+        },
+        "rating": {
+          "type": "number",
+          "description": "Rating out of 5"
+        },
+        "likes": {
+          "type": "number",
+          "description": "Number of likes"
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "description": "When the review was created"
+        }
+      },
+      "required": [
+        "name",
+        "role",
+        "text",
+        "rating",
+        "likes",
+        "createdAt"
+      ]
+    },
+    "Quote": {
+      "title": "Quote",
+      "description": "A user-submitted quote.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "quote": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "timestamp"
+        }
+      },
+      "required": [
+        "name",
+        "quote",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Collection of user reviews"
+    },
+    "/quotes/{quoteId}": {
+      "schema": "Quote",
+      "description": "Collection of user quotes"
+    }
+  }
+}
